@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════
+# ContainerHub - Enterprise .gitignore
+# ═══════════════════════════════════════════════════════════
+
+# ───────────────────────────────────────────────────────────
+# Environment & Secrets
+# ───────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.pem
+*.key
+*.cert
+
+# ───────────────────────────────────────────────────────────
+# Dependencies
+# ───────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ───────────────────────────────────────────────────────────
+# Build Output
+# ───────────────────────────────────────────────────────────
+dist/
+build/
+out/
+*.tsbuildinfo
+.next/
+.cache/
+.parcel-cache/
+.vercel/
+.turbo/
+
+# ───────────────────────────────────────────────────────────
+# Testing & Coverage
+# ───────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+.jest-cache/
+test-results/
+playwright-report/
+__snapshots__/
+
+# ───────────────────────────────────────────────────────────
+# Logs
+# ───────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ───────────────────────────────────────────────────────────
+# Database & Storage
+# ───────────────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+postgres_data/
+redis_data/
+mongo_data/
+mysql_data/
+backups/*.sql
+backups/*.sql.gz
+
+# ───────────────────────────────────────────────────────────
+# IDE & Editor
+# ───────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.template.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ───────────────────────────────────────────────────────────
+# Docker
+# ───────────────────────────────────────────────────────────
+*.tar
+.dockerignore
+
+# ───────────────────────────────────────────────────────────
+# Temporary Files
+# ───────────────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+.cache/
+.temp/
+
+# ───────────────────────────────────────────────────────────
+# OS Files
+# ───────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ───────────────────────────────────────────────────────────
+# CRITICAL: Reference Directories (DO NOT COMMIT)
+# ───────────────────────────────────────────────────────────
+# These folders are for reference only and should NEVER be in git
+docs/
+ui/
+
+# ───────────────────────────────────────────────────────────
+# Kubernetes Secrets (Local Development Only)
+# ───────────────────────────────────────────────────────────
+infrastructure/k8s/secrets.yaml
+infrastructure/k8s/*-secret.yaml
+infrastructure/k8s/*.secret.yaml
+
+# ───────────────────────────────────────────────────────────
+# Jenkins (Future Use)
+# ───────────────────────────────────────────────────────────
+.jenkins/secrets/
+jenkins/credentials/
+
+# ───────────────────────────────────────────────────────────
+# Monitoring & Analytics
+# ───────────────────────────────────────────────────────────
+.sentry/
+.grafana/
+
+# ───────════════════════════════════════════════════════════
+# End of .gitignore
+# ═══════════════════════════════════════════════════════════
