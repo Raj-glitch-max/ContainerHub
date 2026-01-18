@@ -1,13 +1,13 @@
 // ════════════════════════════════════════════════════════════════
-// Submission Service
+// Submission Service - Support Anonymous Submissions
 // ════════════════════════════════════════════════════════════════
 
 import db from '../database/connection';
-import { updateProblemStats } from './problem.service';
+import { update ProblemStats } from './problem.service';
 
 export interface Submission {
     id: number;
-    user_id: number;
+    user_id: number | null; // Nullable for anonymous submissions
     problem_id: number;
     code: string;
     language: string;
@@ -22,14 +22,14 @@ export interface Submission {
 }
 
 export async function createSubmission(data: {
-    user_id: number;
+    user_id: number | null; // Allow null for anonymous submissions
     problem_id: number;
     code: string;
     language: string;
 }) {
     const [submission] = await db('submissions')
         .insert({
-            user_id: data.user_id,
+            user_id: data.user_id, // Can be null
             problem_id: data.problem_id,
             code: data.code,
             language: data.language,
@@ -67,8 +67,8 @@ export async function updateSubmissionResult(
             result.status === 'accepted'
         );
 
-        // Update user stats if accepted
-        if (result.status === 'accepted') {
+        // Update user stats only if user is logged in
+        if (result.status === 'accepted' && submission.user_id) {
             await updateUserStats(submission.user_id, submission.problem_id);
         }
     }
