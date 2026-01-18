@@ -32,15 +32,8 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/problems" element={<ProblemsPage />} />
-                    <Route path="/problems/:slug" element={<ProblemDetailPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
-                    <div className="min-h-screen flex items-center justify-center">
-                        <h1 className="text-4xl font-bold text-gradient">Coming Soon</h1>
-                    </div>
-                    } />
-
-                    {/* Catch all - redirect to landing */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="/leaderboard" element={<LeaderboardPage />} />
                 </Routes>
             </Router>
         </AuthProvider>
