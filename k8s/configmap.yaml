@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: containerhub-config
+  namespace: containerhub
+data:
+  # Backend Config
+  NODE_ENV: "production"
+  PORT: "3001"
+
+  # Database Config
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "containerhub_prod"
+  DB_USER: "postgres"
+
+  # Redis Config
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  # Frontend Config
+  VITE_API_URL: "http://backend-service:3001"

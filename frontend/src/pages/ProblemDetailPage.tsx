@@ -9,6 +9,7 @@ import { useParams, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import { Terminal, Play, CheckCircle, XCircle, Clock, Database, ArrowLeft, Loader } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -62,10 +63,35 @@ export default function ProblemDetailPage() {
     }, [slug]);
 
     useEffect(() => {
-        // Update code when language changes
-        setCode(STARTER_CODE[language]);
-        setResult(null); // Clear previous results
-    }, [language]);
+        if (slug) {
+            const savedCode = localStorage.getItem(`code_${slug}_${language}`);
+            setCode(savedCode || STARTER_CODE[language]);
+            setResult(null);
+        }
+    }, [language, slug]);
+
+    useEffect(() => {
+        if (slug && code !== STARTER_CODE[language]) {
+            const timeoutId = setTimeout(() => {
+                localStorage.setItem(`code_${slug}_${language}`, code);
+            }, 1000);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [code, language, slug]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!submitting && problem) {
+                    handleSubmit();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [submitting, problem, code, language]);
 
     const fetchProblem = async () => {
         try {
@@ -161,10 +187,55 @@ export default function ProblemDetailPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <Loader className="w-12 h-12 mx-auto mb-4 animate-spin" />
-                    <p className="text-gray-600">Loading problem...</p>
+            <div className="min-h-screen bg-white flex flex-col">
+                {/* Header Skeleton */}
+                <div className="border-b border-gray-200 bg-white h-16 px-6 flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <Skeleton className="w-6 h-6 rounded-full" />
+                        <div>
+                            <Skeleton className="h-8 w-64 mb-1" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                    </div>
+                    <Skeleton className="h-8 w-32" />
+                </div>
+
+                {/* Main Content Skeleton */}
+                <div className="flex-1 flex overflow-hidden">
+                    {/* Left Panel Skeleton */}
+                    <div className="w-1/2 border-r border-gray-200 p-8 space-y-8">
+                        <div>
+                            <Skeleton className="h-8 w-32 mb-4" />
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                            </div>
+                        </div>
+                        <div>
+                            <Skeleton className="h-8 w-32 mb-4" />
+                            <Skeleton className="h-32 w-full rounded-lg" />
+                        </div>
+                    </div>
+
+                    {/* Right Panel Skeleton */}
+                    <div className="w-1/2 flex flex-col">
+                        <div className="h-14 border-b border-gray-200 bg-gray-50 px-4 flex items-center justify-between">
+                            <div className="flex space-x-2">
+                                <Skeleton className="h-9 w-24 rounded-lg" />
+                                <Skeleton className="h-9 w-24 rounded-lg" />
+                                <Skeleton className="h-9 w-24 rounded-lg" />
+                            </div>
+                            <Skeleton className="h-9 w-32 rounded-lg" />
+                        </div>
+                        <div className="flex-1 bg-gray-900 p-4">
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full bg-gray-800" />
+                                <Skeleton className="h-4 w-3/4 bg-gray-800" />
+                                <Skeleton className="h-4 w-1/2 bg-gray-800" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -271,8 +342,8 @@ export default function ProblemDetailPage() {
                                     key={lang}
                                     onClick={() => setLanguage(lang)}
                                     className={`px-4 py-2 rounded-lg font-medium transition ${language === lang
-                                            ? 'bg-black text-white'
-                                            : 'bg-white text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-black text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     {lang.charAt(0).toUpperCase() + lang.slice(1)}

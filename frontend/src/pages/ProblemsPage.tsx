@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Code2, Filter, Search, ArrowRight, Terminal } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -110,8 +111,8 @@ export default function ProblemsPage() {
                                     key={diff}
                                     onClick={() => setFilter(diff)}
                                     className={`px-4 py-2 rounded-lg font-medium transition ${filter === diff
-                                            ? 'bg-black text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-black text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     {diff.charAt(0).toUpperCase() + diff.slice(1)}
@@ -124,8 +125,21 @@ export default function ProblemsPage() {
                 {/* Problems List */}
                 {loading ? (
                     <div className="space-y-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="skeleton h-24 w-full"></div>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="neu-card p-6 flex items-center justify-between">
+                                <div className="space-y-3 w-full">
+                                    <div className="flex items-center space-x-3">
+                                        <Skeleton className="h-6 w-48" />
+                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                    </div>
+                                    <div className="flex items-center space-x-4">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-4 w-32" />
+                                        <Skeleton className="h-4 w-40" />
+                                    </div>
+                                </div>
+                                <Skeleton className="h-6 w-6 rounded-full ml-4" />
+                            </div>
                         ))}
                     </div>
                 ) : filteredProblems.length === 0 ? (
