@@ -6,6 +6,7 @@ import { testConnection } from './database/connection';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
+import problemRoutes from './routes/problem.routes';
 
 // Load environment variables
 dotenv.config();
@@ -57,6 +58,7 @@ app.get('/api/v1', (req: Request, res: Response) => {
 
 // Mount routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/problems', problemRoutes);
 
 // ════════════════════════════════════════════════════════════════
 // 404 Handler
