@@ -37,13 +37,10 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('longest_streak').defaultTo(0);
 
         // Verification & Status
-        table.boolean('email_verified').defaultTo(false);
-        table.string('verification_token', 255);
-        table.timestamp('verification_token_expires');
         table.boolean('is_active').defaultTo(true);
         table.enum('role', ['user', 'admin']).defaultTo('user');
 
-        // Timestamps
+        //Timestamps
         table.timestamps(true, true);
 
         // Soft delete
