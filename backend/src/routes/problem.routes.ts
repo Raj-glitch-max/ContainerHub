@@ -1,20 +1,20 @@
 // ════════════════════════════════════════════════════════════════
-// Problem Routes
+// Problem Routes - COMPLETELY PUBLIC (No Authentication)
 // ════════════════════════════════════════════════════════════════
 
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
 import {
-getAllProblems,
-getProblemBySlug,
+    getAllProblems,
+    getProblemBySlug,
 } from '../services/problem.service';
 
 const router = Router();
 
 // ────────────────────────────────────────────────────────────────
 // GET /api/v1/problems - List All Problems
+// PUBLIC - NO AUTHENTICATION REQUIRED
 // ────────────────────────────────────────────────────────────────
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
     try {
         const { difficulty, category } = req.query;
 
@@ -36,8 +36,9 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 
 // ────────────────────────────────────────────────────────────────
 // GET /api/v1/problems/:slug - Get Problem Details
+// PUBLIC - NO AUTHENTICATION REQUIRED
 // ────────────────────────────────────────────────────────────────
-router.get('/:slug', authenticateToken, async (req: Request, res: Response) => {
+router.get('/:slug', async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
 
