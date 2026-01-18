@@ -1,95 +1,103 @@
+// ════════════════════════════════════════════════════════════════
+// Login Page - Real JWT Authentication
+// ════════════════════════════════════════════════════════════════
+
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Terminal, Loader } from 'lucide-react';
 
 export default function LoginPage() {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const { login, isAuthenticated } = useAuth();
+    const [emailOrUsername, setEmailOrUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { login } = useAuth();
-    const navigate = useNavigate();
+    // Redirect if already logged in
+    if (isAuthenticated) {
+        navigate('/dashboard');
+        return null;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
 
         try {
-            await login(formData.email, formData.password);
-            navigate('/');
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Login failed');
+            await login(emailOrUsername, password);
+            navigate('/dashboard');
+        } catch (error) {
+            // Error handled by AuthContext (toast)
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+        <div className="min-h-screen bg-white flex items-center justify-center px-4">
+            <div className="max-w-md w-full">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                        🚀 ContainerHub
-                    </h1>
-                    <p className="text-gray-600">Welcome back!</p>
+                    <Link to="/" className="inline-flex items-center space-x-2 mb-8">
+                        <Terminal className="w-8 h-8" />
+                        <span className="text-2xl font-bold">ContainerHub</span>
+                    </Link>
+                    <h1 className="text-4xl font-black mb-2">Welcome Back</h1>
+                    <p className="text-gray-600">Sign in to continue coding</p>
                 </div>
 
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-red-700 text-sm">{error}</p>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="neu-card p-8 space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
+                        <label className="block text-sm font-medium mb-2">
+                            Email or Username
                         </label>
                         <input
-                            type="email"
+                            type="text"
+                            value={emailOrUsername}
+                            onChange={(e) => setEmailOrUsername(e.target.value)}
                             required
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="you@example.com"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none"
+                            placeholder="Enter your email or username"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2">
                             Password
                         </label>
                         <input
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="••••••••"
+                            minLength={8}
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none"
+                            placeholder="Enter your password"
                         />
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full btn-black flex items-center justify-center space-x-2"
                     >
-                        {loading ? 'Signing in...' : 'Sign In'}
+                        {loading ? (
+                            <>
+                                <Loader className="w-5 h-5 animate-spin" />
+                                <span>Signing in...</span>
+                            </>
+                        ) : (
+                            <span>Sign In</span>
+                        )}
                     </button>
-                </form>
 
-                <div className="mt-6 text-center">
-                    <p className="text-gray-600">
-                        Don't have an account?{' '}
-                        <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-semibold">
-                            Create one
+                    <div className="text-center text-sm">
+                        <span className="text-gray-600">Don't have an account? </span>
+                        <Link to="/register" className="font-medium hover:underline">
+                            Sign up
                         </Link>
-                    </p>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     );

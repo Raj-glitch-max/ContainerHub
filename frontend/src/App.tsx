@@ -1,32 +1,42 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+
+// Pages
 import LandingPage from './pages/LandingPage';
+import ProblemsPage from './pages/ProblemsPage';
+import ProblemDetailPage from './pages/ProblemDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
-import ProblemsPage from './pages/ProblemsPage';
-import ProblemDetailPage from './pages/ProblemDetailPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+
+import './index.css';
 
 function App() {
     return (
         <AuthProvider>
             <Router>
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        duration: 3000,
+                        style: {
+                            background: '#000',
+                            color: '#fff',
+                        },
+                    }}
+                />
                 <Routes>
-                    {/* Public Routes - NO LOGIN REQUIRED */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/problems" element={<ProblemsPage />} />
-                    <Route path="/problems/:slug" element={<ProblemDetailPage />} />
-
-                    {/* Auth Routes (Optional - Hidden for now) */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/problems" element={<ProblemsPage />} />
+                    <Route path="/problems/:slug" element={<ProblemDetailPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
-
-                    {/* Leaderboard (Coming Soon) */}
-                    <Route path="/leaderboard" element={
-                        <div className="min-h-screen flex items-center justify-center">
-                            <h1 className="text-4xl font-bold text-gradient">Coming Soon</h1>
-                        </div>
+                    <div className="min-h-screen flex items-center justify-center">
+                        <h1 className="text-4xl font-bold text-gradient">Coming Soon</h1>
+                    </div>
                     } />
 
                     {/* Catch all - redirect to landing */}

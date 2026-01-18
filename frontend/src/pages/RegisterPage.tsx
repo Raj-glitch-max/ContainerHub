@@ -1,132 +1,115 @@
+// ════════════════════════════════════════════════════════════════
+// Register Page - Real JWT Authentication
+// ════════════════════════════════════════════════════════════════
+
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Terminal, Loader } from 'lucide-react';
 
 export default function RegisterPage() {
-    const [formData, setFormData] = useState({
-        email: '',
-        username: '',
-        password: '',
-        fullName: '',
-    });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    const { register } = useAuth();
     const navigate = useNavigate();
+    const { register } = useAuth();
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
 
         try {
-            await register(
-                formData.email,
-                formData.username,
-                formData.password,
-                formData.fullName
-            );
-            navigate('/');
-        } catch (err: any) {
-            setError(err.response?.data?.error || err.response?.data?.details?.[0] || 'Registration failed');
+            await register(email, username, password);
+            // Success - redirect to login
+            setTimeout(() => navigate('/login'), 2000);
+        } catch (error) {
+            // Error handled by AuthContext
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+        <div className="min-h-screen bg-white flex items-center justify-center px-4">
+            <div className="max-w-md w-full">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                        🚀 ContainerHub
-                    </h1>
-                    <p className="text-gray-600">Create your account</p>
+                    <Link to="/" className="inline-flex items-center space-x-2 mb-8">
+                        <Terminal className="w-8 h-8" />
+                        <span className="text-2xl font-bold">ContainerHub</span>
+                    </Link>
+                    <h1 className="text-4xl font-black mb-2">Create Account</h1>
+                    <p className="text-gray-600">Start your coding journey</p>
                 </div>
 
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-red-700 text-sm">{error}</p>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="neu-card p-8 space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.fullName}
-                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="John Doe"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email *
+                        <label className="block text-sm font-medium mb-2">
+                            Email
                         </label>
                         <input
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="you@example.com"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none"
+                            placeholder="your@email.com"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Username *
+                        <label className="block text-sm font-medium mb-2">
+                            Username
                         </label>
                         <input
                             type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             required
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="johndoe"
+                            minLength={3}
+                            maxLength={20}
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none"
+                            placeholder="Choose a username"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Password *
+                        <label className="block text-sm font-medium mb-2">
+                            Password
                         </label>
                         <input
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                            placeholder="••••••••"
+                            minLength={8}
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none"
+                            placeholder="At least 8 characters"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Must be 8+ characters with uppercase, lowercase, number, and special character
-                        </p>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full btn-black flex items-center justify-center space-x-2"
                     >
-                        {loading ? 'Creating Account...' : 'Create Account'}
+                        {loading ? (
+                            <>
+                                <Loader className="w-5 h-5 animate-spin" />
+                                <span>Creating account...</span>
+                            </>
+                        ) : (
+                            <span>Create Account</span>
+                        )}
                     </button>
-                </form>
 
-                <div className="mt-6 text-center">
-                    <p className="text-gray-600">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                    <div className="text-center text-sm">
+                        <span className="text-gray-600">Already have an account? </span>
+                        <Link to="/login" className="font-medium hover:underline">
                             Sign in
                         </Link>
-                    </p>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     );
