@@ -12,12 +12,18 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "db:migrate": "knex migrate:latest",
-    "db:rollback": "knex migrate:rollback",
-    "db:seed": "knex seed:run",
-    "db:reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run"
+    "db:migrate": "knex migrate:latest --knexfile knexfile.ts",
+    "db:rollback": "knex migrate:rollback --knexfile knexfile.ts",
+    "db:seed": "knex seed:run --knexfile knexfile.ts",
+    "db:reset": "knex migrate:rollback --all --knexfile knexfile.ts && knex migrate:latest --knexfile knexfile.ts && knex seed:run --knexfile knexfile.ts",
+    "db:make-migration": "knex migrate:make --knexfile knexfile.ts -x ts"
   },
-  "keywords": ["coding", "interview", "collaboration", "devops"],
+  "keywords": [
+    "coding",
+    "interview",
+    "collaboration",
+    "devops"
+  ],
   "author": "Raj",
   "license": "MIT",
   "dependencies": {
