@@ -1,0 +1,129 @@
+# ════════════════════════════════════════════════════════════════
+# Production Docker Compose Configuration
+# ════════════════════════════════════════════════════════════════
+# 
+# This configuration uses pre-built images from DockerHub
+# Ready for production deployment
+#
+# Quick Start:
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# ════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  # ────────────────────────────────────────────────────────────
+  # PostgreSQL Database
+  # ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: containerhub-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: containerhub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - containerhub
+
+  # ────────────────────────────────────────────────────────────
+  # Redis Cache
+  # ────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: containerhub-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - containerhub
+
+  # ────────────────────────────────────────────────────────────
+  # Backend API (From DockerHub)
+  # ────────────────────────────────────────────────────────────
+  backend:
+    image: rajglitchmax/containerhub-backend:latest
+    container_name: containerhub-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/containerhub
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change_this_in_production_very_important}
+      JWT_EXPIRY: ${JWT_EXPIRY:-15m}
+      REFRESH_TOKEN_EXPIRY: ${REFRESH_TOKEN_EXPIRY:-7d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - containerhub
+
+  # ────────────────────────────────────────────────────────────
+  # Frontend (From DockerHub)
+  # ────────────────────────────────────────────────────────────
+  frontend:
+    image: rajglitchmax/containerhub-frontend:latest
+    container_name: containerhub-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - containerhub
+
+# ════════════════════════════════════════════════════════════════
+# Networks
+# ════════════════════════════════════════════════════════════════
+networks:
+  containerhub:
+    driver: bridge
+    name: containerhub_network
+
+# ════════════════════════════════════════════════════════════════
+# Volumes (Persistent Storage)
+# ════════════════════════════════════════════════════════════════
+volumes:
+  postgres_data:
+    name: containerhub_postgres_data
+  redis_data:
+    name: containerhub_redis_data
