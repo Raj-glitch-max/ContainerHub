@@ -1,283 +1,229 @@
-# 🚀 ContainerHub - Collaborative Code Interview Platform
+# ContainerHub
 
-A production-grade platform for practicing coding interviews with real-time collaboration, AI-powered code reviews, and comprehensive tracking.
+A modern, minimalist coding practice platform built with containerized code execution. Practice algorithms and data structures with real-time feedback on 48+ curated problems.
 
-[![CI/CD](https://github.com/yourname/containerhub/actions/workflows/ci.yml/badge.svg)](https://github.com/yourname/containerhub/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## Features
 
----
+- **Real Code Execution**: Submit code that runs in isolated Docker containers via Piston API
+- **48 Quality Problems**: Curated problems across Arrays, Strings, Trees, Dynamic Programming, Graphs, and more
+- **Topic-Based Filtering**: Browse problems by category or difficulty level
+- **User Authentication**: Secure JWT-based authentication with email verification
+- **Progress Tracking**: Track solved problems, acceptance rates, and maintain daily streaks
+- **Leaderboard**: Compete with other developers and track your ranking
+- **Modern UI**: Clean, minimalist black and white design inspired by modern web aesthetics
+- **No Ads, No Distractions**: Pure focus on learning and problem-solving
 
-## 🎯 **What is ContainerHub?**
+## Tech Stack
 
-ContainerHub solves the problem of **solo coding practice** by providing:
+### Backend
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js
+- **Database**: PostgreSQL with Knex.js migrations
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **Email**: SendGrid integration for verification emails
+- **Code Execution**: Piston API for containerized code running
 
-✅ **Real-time Collaboration** - Practice problems with peers  
-✅ **AI Code Reviews** - Get instant feedback from Claude AI  
-✅ **Problem Library** - LeetCode-style coding challenges  
-✅ **Progress Tracking** - Analytics, leaderboards, streaks  
-✅ **Multi-Language Support** - Python, JavaScript, Java  
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with custom design system
+- **Router**: React Router v6
+- **Code Editor**: Monaco Editor (VS Code engine)
+- **HTTP Client**: Axios
 
----
+### Infrastructure
+- **Containerization**: Docker with multi-stage builds
+- **Orchestration**: Kubernetes manifests included
+- **Reverse Proxy**: Nginx for production frontend
+- **CI/CD**: Jenkins pipeline configuration
 
-## 🏗️ **Architecture**
+## Quick Start
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Frontend (React 18)                      │
-│                  Hosted on: Vercel (Free)                    │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Backend API (Node.js/Express)               │
-│                  Hosted on: Render (Free)                    │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-    ┌────▼────┐      ┌────▼────┐      ┌────▼────┐
-    │PostgreSQL│      │  Redis  │      │ Claude  │
-    │(Supabase)│      │(Upstash)│      │   API   │
-    └──────────┘      └─────────┘      └─────────┘
-```
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL 14+
+- Docker (optional)
 
----
+### Local Development
 
-## 🛠️ **Technology Stack**
-
-### **Frontend**
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **Monaco Editor** for code editing
-- **React Query** for server state
-- **Socket.io** for real-time collaboration
-
-### **Backend**
-- **Node.js 18** with Express
-- **TypeScript** for type safety
-- **PostgreSQL** with Knex migrations
-- **Redis** for caching & sessions
-- **JWT** authentication
-
-### **Infrastructure**
-- **Docker** & Docker Compose
-- **Kubernetes** manifests (Minikube/Cloud)
-- **GitHub Actions** CI/CD
-- **Prometheus** & Grafana monitoring
-
-### **External Services**
-- **Claude API** - AI code reviews
-- **SendGrid** - Email verification
-- **GitHub OAuth** - Social login
-
----
-
-## 🚀 **Quick Start**
-
-### **Prerequisites**
-- Node.js 18+
-- Docker & Docker Compose
-- Git
-
-### **1. Clone Repository**
+1. **Clone the repository**
 ```bash
-git clone https://github.com/yourname/containerhub.git
-cd containerhub
+git clone https://github.com/Raj-glitch-max/ContainerHub.git
+cd ContainerHub
 ```
 
-### **2. Setup Environment Variables**
+2. **Backend Setup**
 ```bash
-# Backend
-cp backend/.env.example backend/.env
-# Edit backend/.env and add your API keys
-
-# Frontend
-cp frontend/.env.example frontend/.env
-# Edit frontend/.env
-```
-
-### **3. Start Local Development**
-```bash
-# Start PostgreSQL + Redis with Docker Compose
-docker-compose up -d
-
-# Install dependencies (backend)
 cd backend
 npm install
+cp .env.example .env
+# Edit .env with your database credentials
 npm run db:migrate
 npm run db:seed
 npm run dev
+```
 
-# Install dependencies (frontend)
-cd ../frontend
+3. **Frontend Setup** (in a new terminal)
+```bash
+cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-### **4. Access Application**
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:3001
-- **API Health:** http://localhost:3001/health
+4. **Access the application**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
 
----
+### Docker Deployment
 
-## 📦 **Project Structure**
+```bash
+# Pull pre-built images from DockerHub
+docker pull rajglitchmax/containerhub-backend:latest
+docker pull rajglitchmax/containerhub-frontend:latest
+
+# Or use docker-compose
+cp .env.prod.example .env.prod
+docker-compose -f docker-compose.prod.yml up -d
+docker exec containerhub-backend npm run db:migrate
+```
+
+## Environment Variables
+
+### Backend (.env)
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/containerhub
+JWT_SECRET=your-secret-key
+SENDGRID_API_KEY=your-sendgrid-key (optional)
+FROM_EMAIL=noreply@containerhub.com
+FRONTEND_URL=http://localhost:3000
+```
+
+### Frontend (.env)
+```env
+VITE_API_URL=http://localhost:3001
+```
+
+## Project Structure
 
 ```
 ContainerHub/
-├── backend/              # Node.js Express API
+├── backend/
 │   ├── src/
-│   │   ├── database/     # Migrations & seeds
-│   │   ├── routes/       # API endpoints
-│   │   ├── services/     # Business logic (Claude, email)
-│   │   ├── middleware/   # Auth, error handling
-│   │   └── server.ts     # Entry point
-│   ├── Dockerfile
-│   └── package.json
-│
-├── frontend/             # React application
+│   │   ├── routes/          # API route definitions
+│   │   ├── services/        # Business logic
+│   │   ├── middleware/      # Auth & validation
+│   │   └── database/        # Migrations & seeds
+│   └── Dockerfile
+├── frontend/
 │   ├── src/
-│   │   ├── pages/        # Page components
-│   │   ├── components/   # Reusable components
-│   │   ├── hooks/        # Custom React hooks
-│   │   └── App.tsx       # Main app
-│   ├── Dockerfile
-│   └── package.json
-│
-├── infrastructure/       # DevOps configs
-│   ├── k8s/              # Kubernetes manifests
-│   ├── docker-compose.yml
-│   └── scripts/
-│
-├── .github/
-│   └── workflows/        # CI/CD pipelines
-│       ├── ci.yml
-│       └── deploy-staging.yml
-│
-├── .gitignore
-├── README.md
+│   │   ├── pages/           # React pages
+│   │   ├── components/      # Reusable components
+│   │   └── contexts/        # React contexts
+│   └── Dockerfile
+├── k8s/                     # Kubernetes manifests
 └── docker-compose.yml
 ```
 
----
+## API Documentation
 
-## 🧪 **Testing**
+### Authentication
+- `POST /api/v1/auth/register` - Create new account
+- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/verify-email` - Verify email
+- `POST /api/v1/auth/forgot-password` - Request password reset
 
+### Problems
+- `GET /api/v1/problems` - List all problems
+- `GET /api/v1/problems/:slug` - Get problem details
+
+### Submissions
+- `POST /api/v1/submissions` - Submit code for execution
+- `GET /api/v1/submissions/:id` - Get submission result
+
+### Stats
+- `GET /api/v1/stats/me` - Get user statistics
+- `GET /api/v1/stats/leaderboard` - Get top users
+
+## Development
+
+### Running Tests
 ```bash
-# Run all tests
+# Backend tests
+cd backend
 npm test
 
-# Run tests with coverage
-npm run test:coverage
-
-# Run integration tests
-npm run test:integration
-
-# Run E2E tests
-npm run test:e2e
+# Frontend tests  
+cd frontend
+npm test
 ```
 
----
-
-## 🔒 **Security**
-
-- ✅ All passwords hashed with `bcrypt`
-- ✅ JWT tokens with 15-minute expiry
-- ✅ Rate limiting (100 req/min per user)
-- ✅ Input validation with `Joi`
-- ✅ SQL injection prevention (parameterized queries)
-- ✅ XSS prevention (React auto-escaping)
-- ✅ HTTPS in production
-- ✅ Environment variables for secrets
-
----
-
-## 📊 **Monitoring**
-
-- **Prometheus** - Metrics collection
-- **Grafana** - Dashboards & visualization
-- **Sentry** - Error tracking (production)
-
-### **Key Metrics**
-- Request rate (requests/sec)
-- Response time (p50, p95, p99)
-- Error rate
-- Active users
-- Database connections
-
----
-
-## 🚢 **Deployment**
-
-### **Staging Environment**
+### Database Migrations
 ```bash
-# Automatic deployment on push to 'staging' branch
-git push origin staging
-
-# Staging URLs:
-# Frontend: https://containerhub-staging.vercel.app
-# Backend:  https://api-staging.containerhub.render.com
+cd backend
+npm run db:migrate          # Run migrations
+npm run db:rollback         # Rollback last migration
+npm run db:seed             # Seed database
 ```
 
-### **Production Environment**
+### Building for Production
 ```bash
-# Automatic deployment on push to 'main' branch
-git push origin main
+# Backend
+cd backend
+npm run build
 
-# Production URLs:
-# Frontend: https://containerhub.app
-# Backend:  https://api.containerhub.app
+# Frontend
+cd frontend
+npm run build
 ```
 
----
+## Deployment
 
-## 📝 **API Documentation**
+### Docker Images
+Pre-built images are available on DockerHub:
+- Backend: `rajglitchmax/containerhub-backend:latest`
+- Frontend: `rajglitchmax/containerhub-frontend:latest`
 
-API documentation is available at:
-- **Development:** http://localhost:3001/api-docs
-- **Staging:** https://api-staging.containerhub.render.com/api-docs
-- **Production:** https://api.containerhub.app/api-docs
+### Kubernetes
+Apply the manifests in the `k8s/` directory:
+```bash
+kubectl apply -f k8s/
+```
 
----
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
-## 🤝 **Contributing**
+## Contributing
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
----
+## Code of Conduct
 
-## 📜 **License**
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code.
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+## License
 
----
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👤 **Author**
+## Acknowledgments
 
-**Raj**  
-- GitHub: [@yourhandle](https://github.com/yourhandle)  
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+- Code execution powered by [Piston API](https://github.com/engineer-man/piston)
+- Problem inspiration from various competitive programming platforms
+- UI design influenced by modern minimalist web design principles
 
----
+## Support
 
-## 🙏 **Acknowledgments**
+- **Issues**: [GitHub Issues](https://github.com/Raj-glitch-max/ContainerHub/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Raj-glitch-max/ContainerHub/discussions)
 
-- Inspired by LeetCode, HackerRank, and Interview.io
-- Built with best practices from Production SaaS Rules
-- UI/UX references from shadcn/ui
+## Roadmap
 
----
-
-## 📞 **Support**
-
-For issues or questions:
-- Open an issue: [GitHub Issues](https://github.com/yourname/containerhub/issues)
-- Email: support@containerhub.app
+- [ ] C++ and Python 3 support
+- [ ] Submission history and code versioning
+- [ ] Problem difficulty prediction
+- [ ] Company-specific problem tags
+- [ ] Discussion forums per problem
+- [ ] Video solution explanations
 
 ---
 
-**Made with ❤️ for developers preparing for coding interviews**
+**Built with ❤️ by developers, for developers**
