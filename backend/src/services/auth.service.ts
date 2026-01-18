@@ -1,180 +1,203 @@
 // ════════════════════════════════════════════════════════════════
-// Authentication Service
+// Auth Service - REAL User Authentication
 // ════════════════════════════════════════════════════════════════
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import db from '../database/connection';
+import { sendVerificationEmail, sendPasswordResetEmail } from './email.service';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_change_in_production';
-const JWT_EXPIRY = process.env.JWT_EXPIRY || '15m';
-const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || '7d';
-const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRES_IN = '30d';
+const SALT_ROUNDS = 10;
 
-export interface User {
+interface User {
     id: number;
     email: string;
     username: string;
     password_hash: string;
-    full_name?: string;
-    bio?: string;
-    profile_picture_url?: string;
-    skill_level: 'beginner' | 'intermediate' | 'advanced';
-    total_problems_solved: number;
-    acceptance_rate: number;
-    current_streak: number;
     email_verified: boolean;
     verification_token?: string;
-    verification_token_expires?: Date;
-    is_active: boolean;
-    role: 'user' | 'admin';
     created_at: Date;
-    updated_at: Date;
-    deleted_at?: Date;
 }
 
-export interface RegisterData {
-    email: string;
-    username: string;
-    password: string;
-    full_name?: string;
-}
-
-export interface LoginData {
-    email: string;
-    password: string;
-}
-
-export interface TokenPayload {
-    userId: number;
-    email: string;
-    username: string;
-    role: string;
-}
-
-// ────────────────────────────────────────────────────────────────
-// Helper Functions
-// ────────────────────────────────────────────────────────────────
-
-export async function hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, BCRYPT_ROUNDS);
-}
-
-export async function comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
-}
-
-export function generateToken(payload: TokenPayload): string {
-    // @ts-ignore - JWT library types issue, works fine at runtime
-    return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: JWT_EXPIRY });
-}
-
-export function generateRefreshToken(payload: TokenPayload): string {
-    // @ts-ignore - JWT library types issue, works fine at runtime
-    return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: REFRESH_TOKEN_EXPIRY });
-}
-
-export function verifyToken(token: string): TokenPayload {
-    return jwt.verify(token, JWT_SECRET as jwt.Secret) as TokenPayload;
-}
-
-export function generateVerificationToken(): string {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-// ────────────────────────────────────────────────────────────────
-// User Operations
-// ────────────────────────────────────────────────────────────────
-
-export async function findUserByEmail(email: string): Promise<User | null> {
-    const user = await db('users')
-        .where({ email, deleted_at: null })
+export async function register(email: string, username: string, password: string): Promise<{ user: Partial<User>; message: string }> {
+    // Check if user already exists
+    const existingUser = await db('users')
+        .where({ email })
+        .orWhere({ username })
         .first();
-    return user || null;
-}
 
-export async function findUserByUsername(username: string): Promise<User | null> {
-    const user = await db('users')
-        .where({ username, deleted_at: null })
-        .first();
-    return user || null;
-}
+    if (existingUser) {
+        if (existingUser.email === email) {
+            throw new Error('Email already registered');
+        }
+        if (existingUser.username === username) {
+            throw new Error('Username already taken');
+        }
+    }
 
-export async function findUserById(id: number): Promise<User | null> {
-    const user = await db('users')
-        .where({ id, deleted_at: null })
-        .first();
-    return user || null;
-}
+    // Hash password
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
-export async function createUser(data: RegisterData): Promise<User> {
-    const passwordHash = await hashPassword(data.password);
-    const verificationToken = generateVerificationToken();
-    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Generate verification token
+    const verification_token = crypto.randomBytes(32).toString('hex');
+    const verification_expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+    // Create user
     const [user] = await db('users')
         .insert({
-            email: data.email,
-            username: data.username,
-            password_hash: passwordHash,
-            full_name: data.full_name,
-            verification_token: verificationToken,
-            verification_token_expires: verificationExpires,
-            skill_level: 'beginner',
-            role: 'user',
+            email,
+            username,
+            password_hash,
+            email_verified: false,
+            verification_token,
+            verification_expires,
+            created_at: new Date(),
         })
-        .returning('*');
+        .returning(['id', 'email', 'username', 'email_verified', 'created_at']);
 
-    return user;
+    // Send verification email
+    try {
+        await sendVerificationEmail(email, verification_token, username);
+    } catch (error) {
+        console.error('Failed to send verification email:', error);
+        // Don't fail registration if email fails
+    }
+
+    return {
+        user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            email_verified: user.email_verified,
+        },
+        message: 'Registration successful! Please check your email to verify your account.',
+    };
 }
 
-export async function verifyUserEmail(token: string): Promise<boolean> {
+export async function login(emailOrUsername: string, password: string): Promise<{ token: string; user: Partial<User> }> {
+    // Find user by email or username
     const user = await db('users')
-        .where({ verification_token: token })
-        .where('verification_token_expires', '>', new Date())
+        .where({ email: emailOrUsername })
+        .orWhere({ username: emailOrUsername })
         .first();
 
     if (!user) {
-        return false;
+        throw new Error('Invalid credentials');
     }
 
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordValid) {
+        throw new Error('Invalid credentials');
+    }
+
+    // Check if email is verified
+    if (!user.email_verified) {
+        throw new Error('Please verify your email before logging in');
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+        { userId: user.id, email: user.email, username: user.username },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    return {
+        token,
+        user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            email_verified: user.email_verified,
+        },
+    };
+}
+
+export async function verifyEmail(token: string): Promise<{ message: string }> {
+    const user = await db('users')
+        .where({ verification_token: token })
+        .where('verification_expires', '>', new Date())
+        .first();
+
+    if (!user) {
+        throw new Error('Invalid or expired verification token');
+    }
+
+    // Mark email as verified
     await db('users')
         .where({ id: user.id })
         .update({
             email_verified: true,
             verification_token: null,
-            verification_token_expires: null,
+            verification_expires: null,
         });
 
-    return true;
+    return { message: 'Email verified successfully! You can now log in.' };
 }
 
-export async function authenticateUser(data: LoginData): Promise<User | null> {
-    const user = await findUserByEmail(data.email);
+export async function requestPasswordReset(email: string): Promise<{ message: string }> {
+    const user = await db('users').where({ email }).first();
 
     if (!user) {
-        return null;
+        // Don't reveal if email exists
+        return { message: 'If an account with that email exists, a password reset link has been sent.' };
     }
 
-    const isValid = await comparePassword(data.password, user.password_hash);
+    // Generate reset token
+    const reset_token = crypto.randomBytes(32).toString('hex');
+    const reset_expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    if (!isValid) {
-        return null;
+    await db('users')
+        .where({ id: user.id })
+        .update({
+            reset_token,
+            reset_expires,
+        });
+
+    // Send reset email
+    try {
+        await sendPasswordResetEmail(email, reset_token, user.username);
+    } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        throw new Error('Failed to send password reset email');
     }
 
-    if (!user.is_active) {
-        throw new Error('User account is deactivated');
-    }
-
-    return user;
+    return { message: 'If an account with that email exists, a password reset link has been sent.' };
 }
 
-export function getUserPayload(user: User): TokenPayload {
-    return {
-        userId: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-    };
+export async function resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const user = await db('users')
+        .where({ reset_token: token })
+        .where('reset_expires', '>', new Date())
+        .first();
+
+    if (!user) {
+        throw new Error('Invalid or expired reset token');
+    }
+
+    // Hash new password
+    const password_hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    await db('users')
+        .where({ id: user.id })
+        .update({
+            password_hash,
+            reset_token: null,
+            reset_expires: null,
+        });
+
+    return { message: 'Password reset successfully! You can now log in with your new password.' };
+}
+
+export function verifyToken(token: string): { userId: number; email: string; username: string } {
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; email: string; username: string };
+        return decoded;
+    } catch (error) {
+        throw new Error('Invalid or expired token');
+    }
 }
