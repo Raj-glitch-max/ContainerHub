@@ -1,96 +1,39 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 
-// Protected Route Component
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, loading } = useAuth();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading...</p>
-                </div>
-            </div>
-        );
-    }
-
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
-}
-
-// Public Route Component (redirect to dashboard if already logged in)
-function PublicRoute({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, loading } = useAuth();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading...</p>
-                </div>
-            </div>
-        );
-    }
-
-    return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
-}
-
 function App() {
     return (
-        <BrowserRouter>
-            <AuthProvider>
+        <AuthProvider>
+            <Router>
                 <Routes>
-                    <Route
-                        path="/login"
-                        element={
-                            <PublicRoute>
-                                <LoginPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path="/register"
-                        element={
-                            <PublicRoute>
-                                <RegisterPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path="/"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/problems"
-                        element={
-                            <ProtectedRoute>
-                                <ProblemsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/problems/:slug"
-                        element={
-                            <ProtectedRoute>
-                                <ProblemDetailPage />
-                            </ProtectedRoute>
-                        }
-                    />
+                    {/* Public Routes - NO LOGIN REQUIRED */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/problems" element={<ProblemsPage />} />
+                    <Route path="/problems/:slug" element={<ProblemDetailPage />} />
+
+                    {/* Auth Routes (Optional - Hidden for now) */}
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
+
+                    {/* Leaderboard (Coming Soon) */}
+                    <Route path="/leaderboard" element={
+                        <div className="min-h-screen flex items-center justify-center">
+                            <h1 className="text-4xl font-bold text-gradient">Coming Soon</h1>
+                        </div>
+                    } />
+
+                    {/* Catch all - redirect to landing */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-            </AuthProvider>
-        </BrowserRouter>
+            </Router>
+        </AuthProvider>
     );
 }
 
