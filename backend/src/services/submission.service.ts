@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════════
 
 import db from '../database/connection';
-import { update ProblemStats } from './problem.service';
+import { updateProblemStats } from './problem.service';
 
 export interface Submission {
     id: number;
