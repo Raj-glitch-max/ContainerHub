@@ -32,6 +32,7 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/problems" element={<ProblemsPage />} />
+                    <Route path="/problems/:slug" element={<ProblemDetailPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/leaderboard" element={<LeaderboardPage />} />
                 </Routes>

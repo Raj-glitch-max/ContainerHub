@@ -4,7 +4,7 @@
 // ════════════════════════════════════════════════════════════════
 
 import { Link } from 'react-router-dom';
-import { Code2, Zap, Users, Trophy, ArrowRight, Github, Terminal, BookOpen, Play, CheckCircle } from 'lucide-react';
+import { Code2, Zap, Trophy, ArrowRight, Github, Terminal, BookOpen, Play, CheckCircle } from 'lucide-react';
 
 export default function LandingPage() {
     return (
