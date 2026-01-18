@@ -1,53 +1,31 @@
 // ════════════════════════════════════════════════════════════════
-// Authentication Middleware
+// Auth Middleware - JWT Verification
 // ════════════════════════════════════════════════════════════════
 
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken, TokenPayload } from '../services/auth.service';
+import { verifyToken } from '../services/auth.service';
 
-// Extend Express Request to include user
-declare global {
-    namespace Express {
-        interface Request {
-            user?: TokenPayload;
-        }
-    }
+export interface AuthRequest extends Request {
+    userId?: number;
+    userEmail?: string;
+    username?: string;
 }
 
-export function authenticateToken(
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void {
+export function authenticateToken(req: AuthRequest, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
-    const token = authHeader?.split(' ')[1]; // Bearer TOKEN
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-        res.status(401).json({ error: 'Access token required' });
-        return;
+        return res.status(401).json({ error: 'Access token required' });
     }
 
     try {
-        const payload = verifyToken(token);
-        req.user = payload;
+        const decoded = verifyToken(token);
+        req.userId = decoded.userId;
+        req.userEmail = decoded.email;
+        req.username = decoded.username;
         next();
     } catch (error) {
-        res.status(403).json({ error: 'Invalid or expired token' });
+        return res.status(403).json({ error: 'Invalid or expired token' });
     }
-}
-
-export function authorizeRole(...roles: string[]) {
-    return (req: Request, res: Response, next: NextFunction): void => {
-        if (!req.user) {
-            res.status(401).json({ error: 'Authentication required' });
-            return;
-        }
-
-        if (!roles.includes(req.user.role)) {
-            res.status(403).json({ error: 'Insufficient permissions' });
-            return;
-        }
-
-        next();
-    };
 }

@@ -5,14 +5,21 @@
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-    return knex.schema.createTable('users', (table) => {
+    await knex.schema.createTable('users', (table) => {
         // Primary key
         table.increments('id').primary();
 
         // Authentication
-        table.string('email', 255).unique().notNullable().index();
-        table.string('username', 100).unique().notNullable().index();
-        table.string('password_hash', 255).notNullable();
+        table.string('email').notNullable().unique();
+        table.string('username').notNullable().unique();
+        table.string('password_hash').notNullable();
+
+        // Verification & Reset Tokens
+        table.boolean('email_verified').defaultTo(false);
+        table.string('verification_token');
+        table.timestamp('verification_expires');
+        table.string('reset_token');
+        table.timestamp('reset_expires');
 
         // Profile information
         table.string('full_name', 255);
