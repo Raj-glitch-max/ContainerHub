@@ -32,8 +32,8 @@ export async function up(knex: Knex): Promise<void> {
         table.decimal('acceptance_rate', 5, 2).defaultTo(0);
 
         // Categorization
-        table.specificType('tags', 'text[]').defaultTo('{}');
-        table.specificType('companies', 'text[]').defaultTo('{}');
+        table.jsonb('tags').defaultTo('[]');
+        table.jsonb('companies').defaultTo('[]');
         table.string('category', 100); // Arrays, Strings, DP, etc.
 
         // Metadata

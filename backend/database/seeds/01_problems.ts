@@ -27,8 +27,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: { nums: [3, 2, 4], target: 6 }, expected_output: [1, 2] },
                 { input: { nums: [3, 3], target: 6 }, expected_output: [0, 1] }
             ]),
-            tags: ['arrays', 'hash-table', 'easy'],
-            companies: ['google', 'amazon', 'facebook'],
+            tags: JSON.stringify(['arrays', 'hash-table', 'easy']),
+            companies: JSON.stringify(['google', 'amazon', 'facebook']),
             acceptance_rate: 0,
             is_premium: false,
         },
