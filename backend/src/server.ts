@@ -1,7 +1,11 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { testConnection } from './database/connection';
+
+// Import routes
+import authRoutes from './routes/auth.routes';
 
 // Load environment variables
 dotenv.config();
@@ -23,17 +27,20 @@ app.use(express.urlencoded({ extended: true }));
 // ════════════════════════════════════════════════════════════════
 // Health Check Endpoint
 // ════════════════════════════════════════════════════════════════
-app.get('/health', (req: Request, res: Response) => {
-    res.status(200).json({
-        status: 'healthy',
+app.get('/health', async (req: Request, res: Response) => {
+    const dbConnected = await testConnection();
+
+    res.status(dbConnected ? 200 : 503).json({
+        status: dbConnected ? 'healthy' : 'unhealthy',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        database: dbConnected ? 'connected' : 'disconnected'
     });
 });
 
 // ════════════════════════════════════════════════════════════════
-// API Routes (Coming Soon)
+// API Routes
 // ════════════════════════════════════════════════════════════════
 app.get('/api/v1', (req: Request, res: Response) => {
     res.json({
@@ -48,10 +55,23 @@ app.get('/api/v1', (req: Request, res: Response) => {
     });
 });
 
+// Mount routes
+app.use('/api/v1/auth', authRoutes);
+
+// ════════════════════════════════════════════════════════════════
+// 404 Handler
+// ════════════════════════════════════════════════════════════════
+app.use((req: Request, res: Response) => {
+    res.status(404).json({
+        error: 'Not Found',
+        message: `Route ${req.method} ${req.path} not found`
+    });
+});
+
 // ════════════════════════════════════════════════════════════════
 // Error Handler
 // ════════════════════════════════════════════════════════════════
-app.use((err: Error, req: Request, res: Response) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);
     res.status(500).json({
         error: 'Internal Server Error',
@@ -62,10 +82,33 @@ app.use((err: Error, req: Request, res: Response) => {
 // ════════════════════════════════════════════════════════════════
 // Start Server
 // ════════════════════════════════════════════════════════════════
-app.listen(PORT, () => {
-    console.log(`🚀 ContainerHub API running on port ${PORT}`);
-    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-});
+async function startServer() {
+    try {
+        // Test database connection
+        const dbConnected = await testConnection();
+        if (!dbConnected) {
+            console.warn('⚠️  Server starting without database connection');
+        }
+
+        app.listen(PORT, () => {
+            console.log('');
+            console.log('╔════════════════════════════════════════════════╗');
+            console.log('║     🚀 ContainerHub API Server Running        ║');
+            console.log('╚════════════════════════════════════════════════╝');
+            console.log('');
+            console.log(`📍 Environment:  ${process.env.NODE_ENV || 'development'}`);
+            console.log(`🌐 Port:         ${PORT}`);
+            console.log(`🏥 Health:       http://localhost:${PORT}/health`);
+            console.log(`🔐 Auth API:     http://localhost:${PORT}/api/v1/auth`);
+            console.log(`💾 Database:     ${dbConnected ? '✅ Connected' : '❌ Disconnected'}`);
+            console.log('');
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+startServer();
 
 export default app;
