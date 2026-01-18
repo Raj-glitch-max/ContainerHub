@@ -51,29 +51,31 @@ export async function updateSubmissionResult(
         passed_test_count: number;
         total_test_count: number;
     }
-) {
-    await db('submissions')
-        .where({ id: submissionId })
-        .update(result);
+): Promise<void> {
+    const submission = await db('submissions').where({ id: submissionId }).first();
 
-    // Get submission to update problem stats
-    const submission = await db('submissions')
-        .where({ id: submissionId })
-        .first();
+    await db('submissions').where({ id: submissionId }).update({
+        status: result.status,
+        execution_time_ms: result.execution_time_ms,
+        memory_used_mb: result.memory_used_mb,
+        error_message: result.error_message,
+        test_results: result.test_results ? JSON.stringify(result.test_results) : null,
+        passed_test_count: result.passed_test_count,
+        total_test_count: result.total_test_count,
+        updated_at: new Date(),
+    });
 
+    // Update problem stats
     if (submission) {
-        await updateProblemStats(
-            submission.problem_id,
-            result.status === 'accepted'
-        );
+        await updateProblemStats(submission.problem_id, result.status === 'accepted');
 
-        // Update user stats only if user is logged in
-        if (result.status === 'accepted' && submission.user_id) {
-            await updateUserStats(submission.user_id, submission.problem_id);
+        // Update user stats if authenticated
+        if (submission.user_id) {
+            const { updateUserStats } = await import('./user-stats.service');
+            await updateUserStats(submission.user_id, submission.problem_id, result.status === 'accepted');
         }
     }
 
-    return submission;
 }
 
 async function updateUserStats(userId: number, problemId: number) {
