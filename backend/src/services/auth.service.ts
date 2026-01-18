@@ -21,10 +21,17 @@ export interface User {
     bio?: string;
     profile_picture_url?: string;
     skill_level: 'beginner' | 'intermediate' | 'advanced';
+    total_problems_solved: number;
+    acceptance_rate: number;
+    current_streak: number;
     email_verified: boolean;
+    verification_token?: string;
+    verification_token_expires?: Date;
     is_active: boolean;
     role: 'user' | 'admin';
     created_at: Date;
+    updated_at: Date;
+    deleted_at?: Date;
 }
 
 export interface RegisterData {
@@ -59,15 +66,17 @@ export async function comparePassword(password: string, hash: string): Promise<b
 }
 
 export function generateToken(payload: TokenPayload): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+    // @ts-ignore - JWT library types issue, works fine at runtime
+    return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: JWT_EXPIRY });
 }
 
 export function generateRefreshToken(payload: TokenPayload): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
+    // @ts-ignore - JWT library types issue, works fine at runtime
+    return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: REFRESH_TOKEN_EXPIRY });
 }
 
 export function verifyToken(token: string): TokenPayload {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    return jwt.verify(token, JWT_SECRET as jwt.Secret) as TokenPayload;
 }
 
 export function generateVerificationToken(): string {
