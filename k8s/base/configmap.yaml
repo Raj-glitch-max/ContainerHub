@@ -1,0 +1,27 @@
+# ════════════════════════════════════════════════════════════════
+# ConfigMap - Application Configuration
+# ════════════════════════════════════════════════════════════════
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: containerhub-config
+  namespace: containerhub
+data:
+  # Backend Configuration
+  NODE_ENV: "production"
+  PORT: "3001"
+  JWT_EXPIRY: "15m"
+  REFRESH_TOKEN_EXPIRY: "7d"
+  BCRYPT_ROUNDS: "12"
+
+  # Database Configuration
+  POSTGRES_DB: "containerhub"
+  POSTGRES_USER: "postgres"
+
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  # Frontend Configuration
+  VITE_API_URL: "http://backend-service:3001"
