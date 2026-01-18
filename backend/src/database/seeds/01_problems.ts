@@ -27,8 +27,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: { nums: [3, 2, 4], target: 6 }, expected_output: [1, 2] },
                 { input: { nums: [3, 3], target: 6 }, expected_output: [0, 1] }
             ]),
-            tags: ['arrays', 'hash-table', 'easy'],
-            companies: ['google', 'amazon', 'facebook'],
+            tags: JSON.stringify(['arrays', 'hash-table', 'easy']),
+            companies: JSON.stringify(['google', 'amazon', 'facebook']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -50,8 +50,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: '(]', expected_output: false },
                 { input: '([)]', expected_output: false }
             ]),
-            tags: ['stack', 'string', 'easy'],
-            companies: ['microsoft', 'amazon', 'bloomberg'],
+            tags: JSON.stringify(['stack', 'string', 'easy']),
+            companies: JSON.stringify(['microsoft', 'amazon', 'bloomberg']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -71,8 +71,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [1, 2, 3, 4, 5], expected_output: [5, 4, 3, 2, 1] },
                 { input: [1, 2], expected_output: [2, 1] }
             ]),
-            tags: ['linked-list', 'recursion', 'easy'],
-            companies: ['amazon', 'microsoft', 'apple'],
+            tags: JSON.stringify(['linked-list', 'recursion', 'easy']),
+            companies: JSON.stringify(['amazon', 'microsoft', 'apple']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -90,8 +90,8 @@ export async function seed(knex: Knex): Promise<void> {
             test_cases: JSON.stringify([
                 { input: { list1: [1, 2, 4], list2: [1, 3, 4] }, expected_output: [1, 1, 2, 3, 4, 4] }
             ]),
-            tags: ['linked-list', 'recursion', 'easy'],
-            companies: ['amazon', 'microsoft', 'apple'],
+            tags: JSON.stringify(['linked-list', 'recursion', 'easy']),
+            companies: JSON.stringify(['amazon', 'microsoft', 'apple']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -111,8 +111,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [-2, 1, -3, 4, -1, 2, 1, -5, 4], expected_output: 6 },
                 { input: [1], expected_output: 1 }
             ]),
-            tags: ['arrays', 'dynamic-programming', 'easy'],
-            companies: ['amazon', 'microsoft', 'linkedin'],
+            tags: JSON.stringify(['arrays', 'dynamic-programming', 'easy']),
+            companies: JSON.stringify(['amazon', 'microsoft', 'linkedin']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -131,8 +131,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [7, 1, 5, 3, 6, 4], expected_output: 5 },
                 { input: [7, 6, 4, 3, 1], expected_output: 0 }
             ]),
-            tags: ['arrays', 'dynamic-programming', 'easy'],
-            companies: ['amazon', 'facebook', 'microsoft'],
+            tags: JSON.stringify(['arrays', 'dynamic-programming', 'easy']),
+            companies: JSON.stringify(['amazon', 'facebook', 'microsoft']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -153,8 +153,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: -121, expected_output: false },
                 { input: 10, expected_output: false }
             ]),
-            tags: ['math', 'easy'],
-            companies: ['amazon', 'apple', 'adobe'],
+            tags: JSON.stringify(['math', 'easy']),
+            companies: JSON.stringify(['amazon', 'apple', 'adobe']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -173,8 +173,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: { s: 'anagram', t: 'nagaram' }, expected_output: true },
                 { input: { s: 'rat', t: 'car' }, expected_output: false }
             ]),
-            tags: ['string', 'hash-table', 'easy'],
-            companies: ['amazon', 'bloomberg', 'microsoft'],
+            tags: JSON.stringify(['string', 'hash-table', 'easy']),
+            companies: JSON.stringify(['amazon', 'bloomberg', 'microsoft']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -197,8 +197,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: 'bbbbb', expected_output: 1 },
                 { input: 'pwwkew', expected_output: 3 }
             ]),
-            tags: ['string', 'sliding-window', 'medium'],
-            companies: ['amazon', 'adobe', 'bloomberg'],
+            tags: JSON.stringify(['string', 'sliding-window', 'medium']),
+            companies: JSON.stringify(['amazon', 'adobe', 'bloomberg']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -215,8 +215,8 @@ export async function seed(knex: Knex): Promise<void> {
             test_cases: JSON.stringify([
                 { input: { l1: [2, 4, 3], l2: [5, 6, 4] }, expected_output: [7, 0, 8] }
             ]),
-            tags: ['linked-list', 'math', 'medium'],
-            companies: ['amazon', 'microsoft', 'adobe'],
+            tags: JSON.stringify(['linked-list', 'math', 'medium']),
+            companies: JSON.stringify(['amazon', 'microsoft', 'adobe']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -235,8 +235,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [1, 8, 6, 2, 5, 4, 8, 3, 7], expected_output: 49 },
                 { input: [1, 1], expected_output: 1 }
             ]),
-            tags: ['arrays', 'two-pointers', 'medium'],
-            companies: ['amazon', 'facebook', 'adobe'],
+            tags: JSON.stringify(['arrays', 'two-pointers', 'medium']),
+            companies: JSON.stringify(['amazon', 'facebook', 'adobe']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -255,8 +255,8 @@ export async function seed(knex: Knex): Promise<void> {
             test_cases: JSON.stringify([
                 { input: [-1, 0, 1, 2, -1, -4], expected_output: [[-1, -1, 2], [-1, 0, 1]] }
             ]),
-            tags: ['arrays', 'two-pointers', 'sorting', 'medium'],
-            companies: ['facebook', 'amazon', 'microsoft'],
+            tags: JSON.stringify(['arrays', 'two-pointers', 'sorting', 'medium']),
+            companies: JSON.stringify(['facebook', 'amazon', 'microsoft']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -275,8 +275,8 @@ export async function seed(knex: Knex): Promise<void> {
             test_cases: JSON.stringify([
                 { input: ['eat', 'tea', 'tan', 'ate', 'nat', 'bat'], expected_output: [['bat'], ['nat', 'tan'], ['ate', 'eat', 'tea']] }
             ]),
-            tags: ['string', 'hash-table', 'medium'],
-            companies: ['amazon', 'uber', 'yelp'],
+            tags: JSON.stringify(['string', 'hash-table', 'medium']),
+            companies: JSON.stringify(['amazon', 'uber', 'yelp']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -295,8 +295,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: 'babad', expected_output: 'bab' },
                 { input: 'cbbd', expected_output: 'bb' }
             ]),
-            tags: ['string', 'dynamic-programming', 'medium'],
-            companies: ['amazon', 'microsoft', 'adobe'],
+            tags: JSON.stringify(['string', 'dynamic-programming', 'medium']),
+            companies: JSON.stringify(['amazon', 'microsoft', 'adobe']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -315,8 +315,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [1, 2, 3, 4], expected_output: [24, 12, 8, 6] },
                 { input: [-1, 1, 0, -3, 3], expected_output: [0, 0, 9, 0, 0] }
             ]),
-            tags: ['arrays', 'prefix-sum', 'medium'],
-            companies: ['amazon', 'facebook', 'microsoft'],
+            tags: JSON.stringify(['arrays', 'prefix-sum', 'medium']),
+            companies: JSON.stringify(['amazon', 'facebook', 'microsoft']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -337,8 +337,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: { nums1: [1, 3], nums2: [2] }, expected_output: 2.0 },
                 { input: { nums1: [1, 2], nums2: [3, 4] }, expected_output: 2.5 }
             ]),
-            tags: ['arrays', 'binary-search', 'hard'],
-            companies: ['google', 'amazon', 'adobe'],
+            tags: JSON.stringify(['arrays', 'binary-search', 'hard']),
+            companies: JSON.stringify(['google', 'amazon', 'adobe']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -357,8 +357,8 @@ export async function seed(knex: Knex): Promise<void> {
                 { input: [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1], expected_output: 6 },
                 { input: [4, 2, 0, 3, 2, 5], expected_output: 9 }
             ]),
-            tags: ['arrays', 'two-pointers', 'stack', 'hard'],
-            companies: ['amazon', 'google', 'apple'],
+            tags: JSON.stringify(['arrays', 'two-pointers', 'stack', 'hard']),
+            companies: JSON.stringify(['amazon', 'google', 'apple']),
             acceptance_rate: 0,
             is_premium: false,
         },
@@ -376,8 +376,8 @@ export async function seed(knex: Knex): Promise<void> {
             test_cases: JSON.stringify([
                 { input: [[1, 4, 5], [1, 3, 4], [2, 6]], expected_output: [1, 1, 2, 3, 4, 4, 5, 6] }
             ]),
-            tags: ['linked-list', 'heap', 'hard'],
-            companies: ['facebook', 'amazon', 'google'],
+            tags: JSON.stringify(['linked-list', 'heap', 'hard']),
+            companies: JSON.stringify(['facebook', 'amazon', 'google']),
             acceptance_rate: 0,
             is_premium: false,
         },
