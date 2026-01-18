@@ -22,8 +22,8 @@ interface ExecutionResult {
         output: any;
         expected: any;
     }>;
-    passed_test_count?: number;
-    total_test_count?: number;
+    passed_test_count: number;
+    total_test_count: number;
     error_message?: string;
 }
 
@@ -85,6 +85,8 @@ export async function executeCode(
                     return {
                         status: 'compilation_error',
                         error_message: response.data.compile.stderr || response.data.compile.output,
+                        passed_test_count: 0,
+                        total_test_count: testCases.length,
                     };
                 }
 
@@ -122,6 +124,8 @@ export async function executeCode(
                     return {
                         status: 'time_limit_exceeded',
                         error_message: 'Code execution exceeded time limit (5 seconds)',
+                        passed_test_count: 0,
+                        total_test_count: testCases.length,
                     };
                 }
 
@@ -173,6 +177,8 @@ export async function executeCode(
         return {
             status: 'runtime_error',
             error_message: error.message || 'Code execution failed',
+            passed_test_count: 0,
+            total_test_count: testCases.length,
         };
     }
 }
